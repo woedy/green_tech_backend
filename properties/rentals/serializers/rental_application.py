@@ -3,7 +3,6 @@ Serializers for rental application and tenant screening.
 """
 from rest_framework import serializers
 from django.utils import timezone
-from accounts.serializers import UserSerializer
 from properties.serializers import PropertySerializer
 from ..models.rental_application import (
     RentalApplication, ApplicationDocument, TenantScreening,
@@ -89,7 +88,9 @@ class TenantScreeningSerializer(serializers.ModelSerializer):
 
 class RentalApplicationSerializer(serializers.ModelSerializer):
     """Serializer for rental applications."""
-    applicant = UserSerializer(read_only=True)
+    applicant_id = serializers.IntegerField(source='applicant.id', read_only=True)
+    applicant_name = serializers.SerializerMethodField()
+    applicant_email = serializers.EmailField(source='applicant.email', read_only=True)
     property = PropertySerializer(read_only=True)
     status_display = serializers.CharField(
         source='get_status_display',
@@ -111,7 +112,7 @@ class RentalApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = RentalApplication
         fields = [
-            'id', 'property', 'applicant', 'status', 'status_display',
+            'id', 'property', 'applicant_id', 'applicant_name', 'applicant_email', 'status', 'status_display',
             'move_in_date', 'lease_term_months', 'monthly_income',
             'income_type', 'income_type_display', 'employer_name',
             'employer_phone', 'employer_years', 'has_pets', 'pet_description',
@@ -125,9 +126,15 @@ class RentalApplicationSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'applicant', 'property', 'application_date', 'submitted_at',
+            'id', 'property', 'application_date', 'submitted_at',
             'reviewed_at', 'reviewed_by', 'created_at', 'updated_at'
         ]
+
+    def get_applicant_name(self, obj):
+        user = getattr(obj, 'applicant', None)
+        if not user:
+            return None
+        return user.get_full_name() or user.email
 
     def get_can_edit(self, obj):
         """Check if the current user can edit this application."""

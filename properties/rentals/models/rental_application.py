@@ -7,10 +7,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from builtins import property as builtin_property
 
 from accounts.models import User
 from properties.models import Property
-from properties.rentals.models import RentalProperty
 
 
 def get_upload_path(instance, filename):
@@ -158,15 +158,15 @@ class RentalApplication(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
     
-    @property
+    @builtin_property
     def is_approved(self):
         return self.status == RentalApplicationStatus.APPROVED
     
-    @property
+    @builtin_property
     def is_rejected(self):
         return self.status == RentalApplicationStatus.REJECTED
     
-    @property
+    @builtin_property
     def is_pending_review(self):
         return self.status in [
             RentalApplicationStatus.SUBMITTED,
@@ -295,7 +295,7 @@ class TenantScreening(models.Model):
     def __str__(self):
         return f"Screening for {self.application}"
     
-    @property
+    @builtin_property
     def is_complete(self):
         return all([
             self.credit_score is not None,
@@ -304,7 +304,7 @@ class TenantScreening(models.Model):
             self.employment_verification is not None
         ])
     
-    @property
+    @builtin_property
     def is_approved(self):
         return all([
             self.credit_score and self.credit_score >= 600,  # Minimum credit score

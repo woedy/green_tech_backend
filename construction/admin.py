@@ -6,10 +6,10 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from .models import (
-    ConstructionRequest, ConstructionMilestone, 
-    ConstructionDocument, Project, ProjectMilestone,
+    Project, ProjectMilestone,
     Quote, QuoteItem, QuoteChangeLog, QuoteStatus,
-    ProjectStatus, ProjectPhase, MilestoneStatus
+    ProjectStatus, ProjectPhase, MilestoneStatus,
+    ConstructionRequest, ConstructionMilestone, ConstructionDocument
 )
 from django.contrib.auth import get_user_model
 
@@ -21,7 +21,6 @@ class ConstructionMilestoneInline(admin.StackedInline):
     model = ConstructionMilestone
     extra = 0
     fields = ('title', 'description', 'due_date', 'is_completed', 'completed_date')
-    # Removed readonly_fields as they don't exist in the model
 
 
 class ConstructionDocumentInline(admin.TabularInline):
@@ -356,49 +355,6 @@ class QuoteChangeLogAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
-    """Admin interface for construction projects."""
-    list_display = ('name', 'status', 'project_manager', 'start_date', 'sustainability_score')
-    list_filter = ('status', 'region', 'start_date')
-    search_fields = ('name', 'description', 'location')
-    readonly_fields = ('created_at', 'updated_at', 'sustainability_score')
-    fieldsets = (
-        (_('Basic Information'), {
-            'fields': ('name', 'description', 'status', 'construction_request')
-        }),
-        (_('Timeline'), {
-            'fields': ('start_date', 'estimated_end_date', 'actual_end_date')
-        }),
-        (_('Budget & Financials'), {
-            'fields': ('estimated_budget', 'actual_cost', 'currency')
-        }),
-        (_('Sustainability Metrics'), {
-            'fields': (
-                'energy_efficiency_rating', 'water_efficiency_rating',
-                'sustainability_score', 'co2_emissions_saved', 'water_saved'
-            )
-        }),
-        (_('Project Team'), {
-            'fields': ('project_manager', 'site_supervisor', 'contractors')
-        }),
-        (_('Location'), {
-            'fields': ('location', 'gps_coordinates', 'region', 'district')
-        }),
-        (_('Documentation & Notes'), {
-            'fields': ('notes',)
-        }),
-        (_('Metadata'), {
-            'fields': ('created_by', 'created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def save_model(self, request, obj, form, change):
-        """Set created_by to current user if this is a new project."""
-        if not obj.pk:
-            obj.created_by = request.user
-        obj.save()
 
 
 @admin.register(ConstructionMilestone)

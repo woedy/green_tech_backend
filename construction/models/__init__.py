@@ -11,6 +11,7 @@ from .project import (
     ProjectMilestone, 
     MilestoneStatus
 )
+from .request import ConstructionRequest, ConstructionMilestone, ConstructionDocument
 
 # Make models available at the package level
 __all__ = [
@@ -26,4 +27,9 @@ __all__ = [
     'ProjectPhase',
     'ProjectMilestone',
     'MilestoneStatus',
+    
+    # Legacy construction request models
+    'ConstructionRequest',
+    'ConstructionMilestone',
+    'ConstructionDocument',
 ]

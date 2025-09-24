@@ -8,6 +8,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.db.models import Sum, F, Q, Case, When, Value, IntegerField
 from django.db.models.functions import Coalesce
+from builtins import property as builtin_property
 from django.contrib.auth import get_user_model
 
 from construction.models.quote import Quote
@@ -215,7 +216,7 @@ class Project(models.Model):
         
         super().save(*args, **kwargs)
     
-    @property
+    @builtin_property
     def progress_percentage(self):
         """Calculate the project's progress percentage based on completed milestones."""
         if not self.milestones.exists():
@@ -228,7 +229,7 @@ class Project(models.Model):
         
         return round((completed_milestones / total_milestones) * 100, 2)
     
-    @property
+    @builtin_property
     def is_behind_schedule(self):
         """Check if the project is behind schedule."""
         if not self.planned_end_date or not self.actual_start_date:
@@ -246,7 +247,7 @@ class Project(models.Model):
             
         return False
     
-    @property
+    @builtin_property
     def budget_utilization(self):
         """Calculate the percentage of budget utilized."""
         if self.estimated_budget == 0:
